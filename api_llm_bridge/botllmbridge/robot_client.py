@@ -107,8 +107,6 @@ async def _test():
     client = DoarRobotAPIClient()
     await client.connect("192.168.99.124")
 
-    img_dict = {}
-
     try:
         while True:
             available_cameras = await client.get_camera_list()
