@@ -11,8 +11,8 @@ class ArmCommands:
     TURN_RIGHT = ("movec", pa.array([0, -0.04, 0, 0, 0, 0, 0.1]))
     DOWN = ("movec", pa.array( [0, 0, -0.04, 0, 0, 0, 0.1]))
     UP = ("movec", pa.array([0, 0, 0.04, 0, 0, 0, 0.1]))
-    SET_HOME = ("save", pa.array([]))
-    GO_HOME = ("go_to", pa.array([]))
+    SET_HOME = ("save", pa.array(["home"]))
+    GO_HOME = ("go_to", pa.array(["home"]))
     HOLD = ("claw", pa.array([0]))
     RELEASE = ("claw", pa.array([100]))
 
