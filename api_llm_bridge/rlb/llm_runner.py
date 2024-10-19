@@ -10,7 +10,7 @@ from qwen_vl_utils import process_vision_info
 class Qwen2VLGenerator:
     def __init__(
             self,
-            model_path: str = "qwen/qwen-vl-base",
+            model_path: str = "Qwen/Qwen2-VL-2B-Instruct",
             lora_path: Optional[str] = None
     ):
         self.model_path = model_path
