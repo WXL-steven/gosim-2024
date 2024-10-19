@@ -24,16 +24,6 @@ else
     echo "获取sudo权限失败,无法终止占用11451端口的进程"
 fi
 
-# 将`/dev/video*`的权限设置为777
-echo "正在更新摄像头节点权限"
-sudo -v # 刷新sudo权限
-if [ $? -eq 0 ]; then
-    sudo chmod 777 /dev/video*
-    echo "已终止占用11451端口的进程"
-else
-    echo "获取sudo权限失败,无法终止占用11451端口的进程"
-fi
-
 # 以分离模式启动API服务
 echo "正在启动API服务..."
 dora start ./api.yml --detach
