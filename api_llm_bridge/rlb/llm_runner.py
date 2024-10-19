@@ -55,9 +55,21 @@ class Qwen2VLGenerator:
         results = await asyncio.gather(*tasks)
         return dict(results)
 
-    async def generate(self, frames: List[np.ndarray], question: str) -> str:
+    async def generate(
+            self,
+            frames: List[np.ndarray],
+            question: str,
+            max_new_token: int = 1024,
+            temperature: float = 0,
+    ) -> str:
         if self.model is None or self.processor is None:
             await self.load()
+
+        if max_new_token < 128:
+            max_new_token = 128
+
+        if temperature < 0:
+            temperature = 0
 
         processed_frames = await self._preprocess_images(frames)
 
@@ -94,7 +106,8 @@ class Qwen2VLGenerator:
         generated_ids = await asyncio.to_thread(
             self.model.generate,
             **inputs,
-            max_new_tokens=128
+            max_new_tokens=max_new_token,
+            temperature=temperature,
         )
         generated_ids_trimmed = [
             out_ids[len(in_ids):]
