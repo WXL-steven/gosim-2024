@@ -102,10 +102,45 @@ class DoarRobotAPIClient:
     async def chassis_stop(self) -> str:
         return await self.chassis_move("stop")
 
+    async def chassis_parse_prompt(self, prompt: str) -> str:
+        prompt_func_map = {
+            "forward": self.chassis_forward,
+            "backward": self.chassis_backward,
+            "turn_left": self.chassis_turn_left,
+            "turn_right": self.chassis_turn_right,
+            "stop": self.chassis_stop,
+        }
+
+        target_func = prompt_func_map.get(prompt.lower())
+        if target_func:
+            return await target_func()
+        else:
+            return "Error: prompt not found"
+
+    async def arm_parse_prompt(self, prompt: str) -> str:
+        prompt_func_map = {
+            "forward": self.arm_forward,
+            "backward": self.arm_backward,
+            "turn_left": self.arm_turn_left,
+            "turn_right": self.arm_turn_right,
+            "down": self.arm_down,
+            "up": self.arm_up,
+            "hold": self.arm_hold,
+            "release": self.arm_release,
+            "set_home": self.arm_set_home,
+            "go_home": self.arm_go_home
+        }
+
+        target_func = prompt_func_map.get(prompt.lower())
+        if target_func:
+            return await target_func()
+        else:
+            return "Error: prompt not found"
+
 
 async def _test():
     client = DoarRobotAPIClient()
-    await client.connect("192.168.99.124")
+    await client.connect("192.168.99.124", 11451)
 
     try:
         while True:
@@ -123,20 +158,10 @@ async def _test():
             for camera, image in zip(available_cameras, results):
                 if image is not None:
                     cv2.imshow(f"Camera: {camera}", image)
-                # if result['image']:
-                #     # 解码base64图像
-                #     img_data = base64.b64decode(result['image'])
-                #     # 将图像数据转换为numpy数组
-                #     nparr = np.frombuffer(img_data, np.uint8)
-                #     # 解码图像
-                #     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-                #     img_dict[camera] = img
-                #
-                #     # 显示图像
-                #     cv2.imshow(f"Camera: {camera}", img)
 
             # 检查是否按下 'q' 键退出
-            key = cv2.waitKey(1) & 0xFF
+            key = cv2.waitKey(1)
+            key = key & 0xFF
             if key == 27:
                 break
             elif key == ord('w'):
