@@ -51,18 +51,23 @@ async def record(
 
             print(f"\n当前阶段为总共{len(tasks)}个阶段中的"
                   f"[{args_history.get('step', '不可用')}]:" ,end="")
-            while True:
-                last_input_at = time.time()
-                result = await aioconsole.ainput("> ")
-                if time.time() - last_input_at > 1:
-                    break
-                print("内部错误,请重试")
+            # while True:
+            #     last_input_at = time.time()
+            #     result = await aioconsole.ainput("> ")
+            #     if time.time() - last_input_at > 1:
+            #         break
+            #     print("内部错误,请重试")
+
+            result = await safe_input(prompt="> ")
             if result is None or result == "":
                 result = args_history.get("step", 1)
             try:
                 args_history["step"] = result
                 result = int(result)
-                if result < 1:
+                if result == 0:
+                    # 重新请求
+                    continue
+                elif result < 0:
                     # 视作用户主动退出
                     raise KeyboardInterrupt
                 current_task: RLBTask = tasks[result - 1]
@@ -86,14 +91,14 @@ async def record(
                     None
                 )
                 history = str(history) if history is not None else None
-                _available_choices = ','.join(schema.choice) + '\n' \
+                _available_choices = '可用选项为: ' + ','.join(schema.choice) + '\n' \
                     if schema.schema_type == RLBTaskSchemaType.CHOICE \
                     else ''
                 print(f"-----\n"
                       f"正在接收第 {i + 1} 个参数, 参数名为: {schema.schema_key}, "
                       f"目标类型为: {schema.schema_type.name}:\n"
                       f"{schema.prompt}\n"
-                      f"可用选项为: {_available_choices}"
+                      f"{_available_choices}"
                       f"[{history or '无历史'}] ", end="")
                 # while True:
                 #     last_input_at = time.time()
@@ -142,8 +147,8 @@ async def record(
                 continue
 
             print(f"\n生成完成:\n"
-                  f"User Prompt> \n{user_prompt}\n"
-                  f"Assistant Response> \n{assistant_response}\n")
+                  f"User Prompt: \n{user_prompt}\n"
+                  f"Assistant Response: \n{assistant_response}\n")
 
             dataset_manager.append_data(
                 user_prompt=user_prompt,

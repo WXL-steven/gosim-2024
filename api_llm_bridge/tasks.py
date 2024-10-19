@@ -110,10 +110,44 @@ USER_NAVIGATE_TO_BASKET_TASK = RLBTask(
     ],
 )
 
+######################
+# 任务4: 将瓶子放入篮子 #
+######################
+_CHECK_LINE_UP_ALIGNED = RLBTaskSchema(
+    schema_key="line_up_aligned",
+    prompt="您认为您的机械爪在前后范围内已经对齐篮子以至于可以将瓶子放入篮子了吗?",
+    schema_type=RLBTaskSchemaType.BOOLEAN,
+)
+
+_CHECK_LEFT_RIGHT_ALIGNED = RLBTaskSchema(
+    schema_key="left_right_aligned",
+    prompt="您认为您的机械爪在左右范围内已经对齐篮子以至于可以将瓶子放入篮子了吗?",
+    schema_type=RLBTaskSchemaType.BOOLEAN,
+)
+
+USER_PUT_TO_BASKET_TASK = RLBTask(
+    description="任务4: 将瓶子放入篮子",
+    prompt="您正在操控一台机器人,您可以看到一个顶部视角和一个底部视角,"
+           "其中您可以在您的顶部视角中看到您的机械爪和篮子."
+           "您应当注意到您的爪子上夹着一个瓶子."
+           "您当前的目标是使用机械臂将机械爪与瓶子对齐篮子,"
+           "使得当机械爪松开时瓶子可以准确落入篮子."
+           "为了实现目标,您会分别仔细观察顶部视角与底部视角,"
+           "移动机械臂并确保机械爪在全部方向上都与篮子对齐."
+           f"{SECURITY_WARNING}"
+           "您会仔细观察,并为了安全高效的完成目标而回答以下问题.",
+    schema=[
+        _CHECK_LINE_UP_ALIGNED,
+        _CHECK_LEFT_RIGHT_ALIGNED,
+        presuppose.ARM_SCHEMA,
+    ]
+)
+
 USER_TASK_LIST = [
     USER_NAVIGATE_TO_BOTTLE_TASK,
     USER_ALIGN_TO_BOTTLE_TASK,
     USER_NAVIGATE_TO_BASKET_TASK,
+    USER_PUT_TO_BASKET_TASK,
 ]
 
 """

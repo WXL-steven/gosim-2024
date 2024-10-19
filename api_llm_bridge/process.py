@@ -6,7 +6,7 @@ import httpx
 import numpy as np
 
 from rlb import DoarRobotAPIClient
-from rlb import Qwen2VLGenerator
+from rlb.llm_runner import Qwen2VLGenerator
 
 from recorder import safe_input
 from tasks import (USER_NAVIGATE_TO_BASKET_TASK,
@@ -117,13 +117,14 @@ async def process(
                         current_task = USER_ALIGN_TO_BOTTLE_TASK
 
             if current_task is USER_ALIGN_TO_BOTTLE_TASK:
-                if json_response.get("top_aligned") == True \
-                and json_response.get("bottom_aligned") == True \
-                and json_response.get("arm_aligned") == True \
-                and arm_action == "task_finish":
+                if json_response.get("arm_aligned") == True \
+                    and arm_action == "task_finish":
                     print(f"指出任务 {current_task.name} 完成")
                     if input_boolean(prompt="是否进入下一个任务([y]/n)> ", default=True):
                         current_task = USER_NAVIGATE_TO_BASKET_TASK
+                    if input_boolean(prompt="是否执行机械爪抓取([y]/n)> ", default=True):
+                        status = await robot.arm_hold()
+                        print(f"执行结果: {status}")
                     if input_boolean(prompt="是否执行机械臂Go Home([y]/n)> ", default=True):
                         status = await robot.arm_go_home()
                         print(f"执行结果: {status}")
