@@ -46,7 +46,7 @@ class Qwen2VLGenerator:
         return model
 
     async def _preprocess_images(self, frames: List[np.ndarray]) -> Dict[str, Image.Image]:
-        async def convert_image(idx: int, frame: np.ndarray) -> tuple:
+        def convert_image(idx: int, frame: np.ndarray) -> tuple:
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             pil_image = Image.fromarray(rgb_frame)
             return (str(idx), pil_image)
@@ -112,7 +112,12 @@ class Qwen2VLGenerator:
 
 async def main():
     # 使用 LoRA 权重
-    generator = Qwen2VLGenerator(lora_path="path/to/your/lora/weights")
+    # generator = Qwen2VLGenerator(lora_path="path/to/your/lora/weights")
+    # /home/steven/Documents/Models/Qwen2-VL-2B-Instruct
+    generator = Qwen2VLGenerator(
+                    model_path="/home/steven/Documents/Models/Qwen2-VL-2B-Instruct",
+                    lora_path=None
+                )
 
     # 不使用 LoRA 权重
     # generator = Qwen2VLGenerator()
@@ -120,8 +125,8 @@ async def main():
     # 可以选择在这里预加载模型
     # await generator.load()
 
-    image = cv2.imread("images/1.jpg")
-    result = await generator.generate([image], "您在这些图像中分别看到了什么内容？")
+    image = cv2.imread(r"./image.jpeg")
+    result = await generator.generate([image], "您在这些/张图像中(分别)看到了什么内容？")
     print(result)
 
 
