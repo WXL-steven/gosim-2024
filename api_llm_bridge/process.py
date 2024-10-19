@@ -124,6 +124,9 @@ async def process(
                     print(f"指出任务 {current_task.name} 完成")
                     if input_boolean(prompt="是否进入下一个任务([y]/n)> ", default=True):
                         current_task = USER_NAVIGATE_TO_BASKET_TASK
+                    if input_boolean(prompt="是否执行机械臂Go Home([y]/n)> ", default=True):
+                        status = await robot.arm_go_home()
+                        print(f"执行结果: {status}")
 
             if current_task is USER_NAVIGATE_TO_BASKET_TASK:
                 if json_response.get("aligned_basket") == True \
