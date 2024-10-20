@@ -26,10 +26,18 @@ class DatasetManager:
         with open(self.json_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
-        # 创建新的数据条目
+        # # 创建新的数据条目
+        # new_entry = {
+        #     "messages": [
+        #         {"content": f"<image>{user_prompt}", "role": "user"},
+        #         {"content": assistant, "role": "assistant"}
+        #     ],
+        #     "images": []
+        # }
+        image_tags = '<image>' * len(images)
         new_entry = {
             "messages": [
-                {"content": f"<image>{user_prompt}", "role": "user"},
+                {"content": f"{image_tags}{user_prompt}", "role": "user"},
                 {"content": assistant, "role": "assistant"}
             ],
             "images": []

@@ -97,7 +97,7 @@ USER_NAVIGATE_TO_BASKET_TASK = RLBTask(
     description="任务3: 导航并控制机械爪对齐篮子",
     prompt="您正在操控一台机器人,您可以看到一个顶部视角和一个底部视角,"
            "其中您可以在您的顶部视角中看到您的机械爪和一个篮子."
-           "您当前的目标是使用机械爪将篮子夹起,"
+           "您当前的目标是控制机器人使得篮子与机械爪和瓶子对齐,"
            "为了实现目标,您会分别仔细观察顶部视角与底部视角,"
            "移动机械臂并确保机械爪在全部方向上都与篮子对齐."
            f"{SECURITY_WARNING}"
@@ -149,6 +149,38 @@ USER_TASK_LIST = [
     USER_NAVIGATE_TO_BASKET_TASK,
     USER_PUT_TO_BASKET_TASK,
 ]
+
+_IS_LINE_UP_ALIGNED = RLBTaskSchema(
+    schema_key="line_up_aligned",
+    prompt="您认为俯视图中的机械爪在前后范围内已经对齐瓶子了吗?",
+    schema_type=RLBTaskSchemaType.BOOLEAN,
+)
+
+_IS_LEFT_RIGHT_ALIGNED = RLBTaskSchema(
+    schema_key="left_right_aligned",
+    prompt="您认为俯视图中的机械爪在左右范围内已经对齐瓶子了吗?",
+    schema_type=RLBTaskSchemaType.BOOLEAN,
+)
+
+_IS_UP_DOWN_ALIGNED = RLBTaskSchema(
+    schema_key="up_down_aligned",
+    prompt="您认为前视图中的机械爪在上下范围内已经对齐瓶子了吗?",
+    schema_type=RLBTaskSchemaType.BOOLEAN,
+)
+
+BOTTLE_ALIGNMENT_TASK = RLBTask(
+    description="任务0: 将机械爪与瓶子对齐",
+    prompt="为了将机械爪对齐瓶子,您会分别观察俯视图与前视图中机械爪与瓶子的位置,"
+           "并控制机械臂执行一种操作,使得机械爪与瓶子更加对齐.",
+    schema=[
+        _IS_LINE_UP_ALIGNED,
+        _IS_LEFT_RIGHT_ALIGNED,
+        _IS_UP_DOWN_ALIGNED,
+        presuppose.ARM_SCHEMA,
+    ]
+)
+
+NEW_TASK_LIST = [BOTTLE_ALIGNMENT_TASK]
 
 """
 TASKS_EXAMPLE = [

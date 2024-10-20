@@ -191,11 +191,12 @@ async def record(
 
 
 if __name__ == "__main__":
-    from tasks import USER_TASK_LIST
+    # from tasks import USER_TASK_LIST
+    from tasks import NEW_TASK_LIST
 
     JPEG_QUALITY = 80
     IMG_MAX_LENGTH = 320
     SAVE_DIR = r"./recorded_dataset"
-    PROJECT_NAME = "user_project"
+    PROJECT_NAME = "last_test"
 
-    asyncio.run(record(USER_TASK_LIST, "192.168.99.124", save_dir=SAVE_DIR, project_name=PROJECT_NAME))
+    asyncio.run(record(NEW_TASK_LIST, "192.168.99.124", save_dir=SAVE_DIR, project_name=PROJECT_NAME))
