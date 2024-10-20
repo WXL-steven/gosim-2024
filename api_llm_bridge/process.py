@@ -11,7 +11,8 @@ from rlb.llm_runner import Qwen2VLGenerator
 from recorder import safe_input
 from tasks import (USER_NAVIGATE_TO_BASKET_TASK,
                    USER_ALIGN_TO_BOTTLE_TASK,
-                   USER_NAVIGATE_TO_BOTTLE_TASK)
+                   USER_NAVIGATE_TO_BOTTLE_TASK,
+                   BOTTLE_ALIGNMENT_TASK)
 
 
 async def input_boolean(prompt: str, default: bool) -> bool:
@@ -67,7 +68,7 @@ async def process(
         llm = Qwen2VLGenerator(model_path=model_path, lora_path=lora_path)
         await llm.load()
 
-    current_task = USER_NAVIGATE_TO_BOTTLE_TASK
+    current_task = BOTTLE_ALIGNMENT_TASK
     retry_count = 0
     user_prompt = current_task.to_prompt()
     try:
@@ -139,6 +140,15 @@ async def process(
                     print(f"指出物品掉落")
                     if input_boolean(prompt="是否返回首个任务([y]/n)> ", default=True):
                         current_task = USER_NAVIGATE_TO_BOTTLE_TASK
+
+            if current_task is BOTTLE_ALIGNMENT_TASK:
+                if json_response.get("arm_aligned"):
+                    if input_boolean(prompt="是否执行机械爪抓取([y]/n)> ", default=True):
+                        status = await robot.arm_hold()
+                        print(f"执行结果: {status}")
+                    if input_boolean(prompt="是否松开机械爪([y]/n)> ", default=True):
+                        status = await robot.arm_release()
+                        print(f"执行结果: {status}")
 
     except (asyncio.CancelledError, KeyboardInterrupt):
         await robot.chassis_stop()
