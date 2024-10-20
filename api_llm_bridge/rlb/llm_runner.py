@@ -68,9 +68,6 @@ class Qwen2VLGenerator:
         if max_new_token < 128:
             max_new_token = 128
 
-        if temperature < 0:
-            temperature = 0
-
         processed_frames = await self._preprocess_images(frames)
 
         messages = [
@@ -107,7 +104,8 @@ class Qwen2VLGenerator:
             self.model.generate,
             **inputs,
             max_new_tokens=max_new_token,
-            temperature=temperature,
+            temperature=temperature + 1e-6,
+            do_sample=temperature <= 0.0
         )
         generated_ids_trimmed = [
             out_ids[len(in_ids):]
@@ -129,17 +127,18 @@ async def main():
     # /home/steven/Documents/Models/Qwen2-VL-2B-Instruct
     generator = Qwen2VLGenerator(
                     model_path="/home/steven/Documents/Models/Qwen2-VL-2B-Instruct",
-                    lora_path=None
+                    lora_path="/home/steven/Documents/LLaMA-Factory/saves/qwen2_vl-2b/lora/sft/checkpoint-180"
                 )
 
     # 不使用 LoRA 权重
     # generator = Qwen2VLGenerator()
 
     # 可以选择在这里预加载模型
-    # await generator.load()
+    await generator.load()
 
-    image = cv2.imread(r"./image.jpeg")
-    result = await generator.generate([image], "您在这些/张图像中(分别)看到了什么内容？")
+    image1 = cv2.imread(r"/home/steven/Documents/LLaMA-Factory/data/steven_qwen_vl_lora_prj/images/user_project_63_0.jpg")
+    image2 = cv2.imread(r"/home/steven/Documents/LLaMA-Factory/data/steven_qwen_vl_lora_prj/images/user_project_63_1.jpg")
+    result = await generator.generate([image1, image2], "您正在操控一台机器人,您可以看到一个顶部视角和一个底部视角,其中您可以在您的顶部视角中看到您的机械爪和一个篮子.您当前的目标是使用机械爪将篮子夹起,为了实现目标,您会分别仔细观察顶部视角与底部视角,移动机械臂并确保机械爪在全部方向上都与篮子对齐.您会选择谨慎的避开可能发生碰撞的人和障碍物,并始终相信安全比任务更重要.您会仔细观察,并为了安全高效的完成目标而回答以下问题.\n您需要根据以下格式以JSON填写表单:\n{'can_see_basket': '[Boolean]: 您当前当前可以在视野中看到篮子吗?', 'is_holding': '[Boolean]: 您当前可以看到您的机械爪和瓶子吗?您的机械爪仍然抓着瓶子吗?', 'aligned_basket': '[Boolean]: 您认为您的机械爪已经对齐篮子以至于您松开夹爪可以使瓶子准确地落入篮子?', 'chassis_action': '[Specified String]: 为了完成任务,您决定向什么方向移动机器人?或是您觉得一切已经就绪了?您必须且只能从以下选项中选择一种操作来填写该键:forward,backward,turn_left,turn_right,task_finish'}")
     print(result)
 
 
